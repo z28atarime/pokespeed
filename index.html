@@ -1,0 +1,426 @@
+﻿<!DOCTYPE html>
+
+<html lang="ja" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>素早さチェッカー</title>
+</head>
+
+<body style="padding-top: 3rem">
+
+    <!-- header -->
+    <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
+        <!-- 省略 -->
+        <button type="button" class="btn btn-primary" onclick="update()">更新</button>
+    </nav>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">素早</th>
+                <th scope="col">努力</th>
+                <th scope="col">性格</th>
+                <th scope="col">個体</th>
+                <th scope="col"><img src="img/scarf.png"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="pokemonListTable">
+        </tbody>
+    </table>
+
+
+
+
+
+    <script>
+
+        class PokemonData {
+
+            constructor(status, effort, temper, individual) {
+
+                this.status = status;//ステータスインスタンス
+                this.effort = effort;//努力値
+                this.temper = temper;//性格補正
+                this.individual = individual;//個体値
+                this.isScarf = false;//スカーフフラグ
+                this.isReCalc = false;//再計算フラグ
+
+                this.setAgilityNum();//すばやさ実数値
+                //this.agilityNum = this.getAgilityNum();
+
+            }
+
+            getAgilityNum() {
+
+                //var num = ((this.status.agility * 2 + this.individual + this.effort / 4) * 50 / 100 + 5) * this.temper;
+                var num = Math.floor(this.status.agility * 2 + this.individual + this.effort / 4);
+                num = Math.floor(num * 50 / 100 + 5) * this.temper;
+                num = Math.floor(num);
+
+                console.log("スカーフ補正" + this.isScarf);
+                if (this.isScarf) {
+
+                    num *= 1.5;
+
+                }
+
+                num = Math.floor(num);
+                return num;
+            }
+
+            setAgilityNum() {
+                this.agilityNum = this.getAgilityNum();
+            }
+
+
+        }
+
+
+
+        //ステータスリスト
+        const statusDatas = [];
+        createStatusList();
+
+        //お気に入りリスト
+        var favPokemonList = [];
+        favPokemon();
+
+        //表示用リスト
+        var showPokemonList = [];
+        createAllShowPokemon();
+
+        const table = document.getElementById("pokemonListTable");
+
+        //すばやさでソート
+        showPokemonList = sort();
+
+
+        showTable();
+
+        //表示用リストにあるポケモンを表示
+        function showTable() {
+
+            while (table.rows.length > 0) table.deleteRow(0);
+
+
+
+
+
+            for (let i = 0; i < showPokemonList.length; i++) {
+
+                //空の行要素を先に作成tr
+                let tr = document.createElement("tr");
+                //変更がある場合は色を変更
+                if (showPokemonList[i].isReCalc) {
+                    tr.setAttribute("class", "table-warning");
+                }
+
+                //th追加
+                let th = document.createElement("th");
+                th.setAttribute("scope", "row");
+                //thの中に画像表示
+                var img = document.createElement("img");
+                var number = showPokemonList[i].status.number;
+                img.src = 'img/n' + number + '.gif';
+                th.appendChild(img);
+                tr.appendChild(th);
+
+
+                //すばやさ表示
+                let td = document.createElement("td");
+
+                var div = document.createElement("div");
+                div.setAttribute("class", "font-weight-bold");
+
+
+                td.setAttribute("style", "vertical-align:middle");
+                let inp = document.createTextNode(showPokemonList[i].agilityNum);
+                div.appendChild(inp);
+                td.appendChild(div);
+                tr.appendChild(td);
+                table.appendChild(tr);
+
+                //努力値
+                var list = [252, 4, 0];
+                tr = selectNum(0, tr, list, showPokemonList[i].effort, i);
+
+                table.appendChild(tr);
+
+                //性格補正
+                list = [0.9, 1.0, 1.1];
+                tr = selectNum(1, tr, list, showPokemonList[i].temper, i);
+                table.appendChild(tr);
+
+                //個体値
+                list = [31, 0];
+                tr = selectNum(2, tr, list, showPokemonList[i].individual, i);
+                table.appendChild(tr);
+
+                //スカーフ
+                //td = document.createElement("td");
+                tr = selectCheck(0, tr, i);
+
+                table.appendChild(tr);
+                //<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+
+                //ごみ箱アイコン
+                td = document.createElement("td");
+                var bt = document.createElement("button");
+                bt.setAttribute("type", "button");
+                bt.setAttribute("class", "btn btn-outline-danger");
+                bt.setAttribute("onclick", "remove(" + i + ")");
+
+                var icon = document.createElement("i");
+                icon.setAttribute("class", "fas fa-trash-alt mr-1");
+
+                bt.appendChild(icon);
+                td.appendChild(bt);
+                tr.appendChild(td);
+                table.appendChild(tr);
+                //<button type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt mr-1"></i></button>
+
+
+            }
+
+
+        }
+
+
+
+        //数値の選択
+        function selectNum(mode, tr, selectList, nowSelect, listNum) {
+            var td = document.createElement("td");
+            var label = document.createElement("label");
+            label.setAttribute("for", "exampleFormControlSelect1");
+
+            var select = document.createElement("select");
+            select.setAttribute("class", "form-control");
+            var selectId = "";
+            switch (mode) {
+                case 0://努力値
+                    selectId = "effortSelect";
+
+                    break;
+                case 1://性格補正
+                    selectId = "temperSelect";
+
+                    break;
+                case 2://個体値
+                    selectId = "individualSelect";
+                    break;
+            }
+
+            selectId += listNum.toString();
+            select.setAttribute("id", selectId);
+            select.setAttribute("onchange", "change(\"" + selectId + "\")");
+
+            //選択肢追加
+            for (let i = 0; i < selectList.length; i++) {
+
+                var option = document.createElement("option");
+                //Vale追加
+                option.setAttribute("value", listNum + "&" + selectList[i]);
+
+                if (selectList[i] == nowSelect) {
+                    option.setAttribute("selected", "");
+                }
+                var num = document.createTextNode(selectList[i]);
+                option.appendChild(num);
+                //option.setAttribute("onclick", "remove(" + listNum+ ")");
+                select.appendChild(option);
+
+            }
+
+            label.appendChild(select);
+            td.appendChild(label);
+            tr.appendChild(td);
+
+            return tr;
+        }
+        //ドロップダウン選択時
+        function change(selectId) {
+            //console.log("てすと" + selectId);
+            selectValue = document.getElementById(selectId).value;
+            //console.log("てすと" + selectValue);
+            var values = selectValue.split("&");
+            //console.log("てすと" + values);
+
+            if (selectId.match(/effort/)) {
+                //努力値
+                showPokemonList[values[0]].effort = Number(values[1]);
+
+            } else if (selectId.match(/temper/)) {
+                //性格補正
+                showPokemonList[values[0]].temper = Number(values[1]);
+            } else if (selectId.match(/individual/)) {
+                //個体値
+                showPokemonList[values[0]].individual = Number(values[1]);
+            }
+
+            console.log(showPokemonList);
+
+            showPokemonList[values[0]].setAgilityNum();
+            showPokemonList[values[0]].isReCalc = true;
+            showTable();
+
+
+        }
+
+        //チェックボックス作成 mode0スカーフ
+        function selectCheck(mode, tr, listNum) {
+
+            var td = document.createElement("td");
+            td.setAttribute("style", "vertical-align:middle");
+            var inp = document.createElement("input")
+
+            inp.setAttribute("class", "form-check-input");
+            inp.setAttribute("type", "checkbox");
+            inp.setAttribute("value", listNum);
+            inp.setAttribute("id", "scarf" + listNum);
+            inp.setAttribute("onchange", "checkChange(\"" + "scarf" + listNum + "\")");
+
+            switch (mode) {
+                case 0://スカーフ
+                    break;
+            }
+
+            if (showPokemonList[listNum].isScarf) {
+
+                inp.setAttribute("checked", "");
+            }
+
+
+            td.appendChild(inp);
+            tr.appendChild(td);
+
+            return tr;
+        }
+
+        function checkChange(checkId) {
+            //console.log("てすと" + checkId);
+            var checkValue = document.getElementById(checkId).value;
+            var isCheck = document.getElementById(checkId).checked;
+            //console.log("てすと" + checkValue);
+            //var values = checkValue.split("&");
+
+            if (checkId.match(/scarf/)) {
+                showPokemonList[checkValue].isScarf = isCheck;
+                console.log(isCheck);
+            }
+
+
+            showPokemonList[checkValue].setAgilityNum();
+            showPokemonList[checkValue].isReCalc = true;
+
+            showTable();
+        }
+
+
+
+        //【クラス】ポケモンのステータス
+        function Status(number, name, agility) {
+            this.number = number;
+            this.name = name;
+            this.agility = agility;
+        }
+
+
+        //ポケモンのステータスリストを作る
+        function createStatusList() {
+            statusDatas.push(new Status(908, "マスカーニャ", 123));
+            statusDatas.push(new Status(911, "ラウドボーン", 66));
+            statusDatas.push(new Status(914, "ウェーニバル", 85));
+            statusDatas.push(new Status(663, "ファイアロー", 126));
+            statusDatas.push(new Status(956, "パーモット", 105));
+            statusDatas.push(new Status(820, "ヨクバリス", 20));
+            statusDatas.push(new Status(823, "アーマーガア", 67));
+            statusDatas.push(new Status(184, "マリルリ", 50));
+            statusDatas.push(new Status(1009, "ドオー", 20));
+            statusDatas.push(new Status(94, "ゲンガー", 110));
+            statusDatas.push(new Status(946, "イッカネズミ", 111));
+            statusDatas.push(new Status(398, "ムクホーク", 100));
+            statusDatas.push(new Status(429, "ムウマージ", 105));
+            statusDatas.push(new Status(445, "ガブリアス", 102));
+            statusDatas.push(new Status(965, "キョジオーン", 35));
+            statusDatas.push(new Status(1010, "コノヨザル", 90));
+            statusDatas.push(new Status(1004, "グレンアルマ", 75));
+            statusDatas.push(new Status(197, "ブラッキー", 65));
+            statusDatas.push(new Status(967, "キラフロル", 86));
+            statusDatas.push(new Status(248, "バンギラス", 61));
+            statusDatas.push(new Status(887, "ドラパルト", 142));
+            statusDatas.push(new Status(951, "セグレイブ", 87));
+            statusDatas.push(new Status(977, "サーフゴー", 84));
+            statusDatas.push(new Status(286, "キノガッサ", 70));
+            statusDatas.push(new Status(778, "ミミッキュ", 96));
+            statusDatas.push(new Status(934, "イルカマン", 100));
+            statusDatas.push(new Status(135, "サンダース", 130));
+
+
+        }
+
+        //表示用のポケモン単体追加status,努力値,性格補正,個体値
+        function addShowPokemon(status, effort, temper, individual) {
+            const pokemonData = new PokemonData(status, effort, temper, individual);
+            showPokemonList.push(pokemonData);
+            //showPokemonList.push(new PokemonData(status, effort, temper, individual));
+            //onsole.log(showPokemonList);
+        }
+
+        //表示用のポケモン全員追加
+        function createAllShowPokemon() {
+            for (let i = 0; i < statusDatas.length; i++) {
+                addShowPokemon(statusDatas[i], 252, 1.0, 31);
+            }
+
+            //お気に入りで上書き
+        }
+
+
+
+        //お気に入りをまさかの手動設定
+        function favPokemon() {
+
+        }
+
+        //表示リストをすばやさ順にソート
+        function sort() {
+            //isReCalc更新
+
+            for (let i = 0; i < showPokemonList.length; i++) {
+                showPokemonList[i].isReCalc = false;
+            }
+
+
+            let result = showPokemonList.sort(function (a, b) {
+                return (a.agilityNum > b.agilityNum) ? -1 : 1;  //オブジェクトの降順ソート
+            });
+            return result;
+        }
+
+        //表示更新
+        function update() {
+            sort();
+            showTable();
+        }
+
+        //要素削除
+        function remove(removeNum) {
+            showPokemonList.splice(removeNum, 1);
+            showTable();
+        }
+
+
+
+
+
+    </script>
+
+
+
+</body>
+</html>
