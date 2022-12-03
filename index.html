@@ -4,18 +4,39 @@
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        .select2-selection__rendered {
+            line-height: 37px !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+        }
+
+        .select2-selection__arrow {
+            height: 35px !important;
+        }
+    </style>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>素早さチェッカー</title>
 </head>
 
-<body style="padding-top: 3rem">
+<body style="padding-top: 4rem">
 
     <!-- header -->
+
     <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
-        <!-- 省略 -->
-        <button type="button" class="btn btn-primary" onclick="update()">更新</button>
+        <button type="button" class="btn btn-primary col-auto mx-4 my-1" onclick="update()">更新</button>
+        <select class="select mx-2" id="searchPokemon" style="width: 250px" data-placeholder="追加するポケモンを選択">
+            <option ></option>
+            
+        </select>
     </nav>
+
 
     <table class="table">
         <thead>
@@ -33,7 +54,10 @@
         </tbody>
     </table>
 
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
 
@@ -96,20 +120,19 @@
 
         const table = document.getElementById("pokemonListTable");
 
+        
+
         //すばやさでソート
         showPokemonList = sort();
 
 
         showTable();
+        searchAddPokemon("searchPokemon");
 
         //表示用リストにあるポケモンを表示
         function showTable() {
 
             while (table.rows.length > 0) table.deleteRow(0);
-
-
-
-
 
             for (let i = 0; i < showPokemonList.length; i++) {
 
@@ -148,7 +171,6 @@
                 //努力値
                 var list = [252, 4, 0];
                 tr = selectNum(0, tr, list, showPokemonList[i].effort, i);
-
                 table.appendChild(tr);
 
                 //性格補正
@@ -190,7 +212,40 @@
 
         }
 
+        //ポケモンの検索候補を追加
+        function searchAddPokemon(selectId) {
 
+            var selectTag = document.getElementById(selectId);
+            selectTag.setAttribute("onchange", "addPokemon()");
+            
+            for (let i = 0; i < statusDatas.length; i++) {
+                var pokeName = statusDatas[i].name;
+                var option = document.createElement("option");
+                //option.setAttribute("value", statusDatas[i].number.toString());
+                option.setAttribute("value", i.toString());
+                
+            
+                var name = document.createTextNode(pokeName);
+                selectTag.appendChild(option);
+                option.appendChild(name);
+
+            }
+        }
+
+        //選択したポケモンの追加
+        function addPokemon() {
+            var value = document.getElementById("searchPokemon").value;
+          
+            const pokemonData = new PokemonData(statusDatas[value], 252, 1, 31);
+            pokemonData.isReCalc = true;
+            showPokemonList.unshift(pokemonData);
+
+            //addShowPokemon(statusDatas[value], 252, 1, 31);
+            showTable();
+
+            var selectTag = document.getElementById("searchPokemon");
+
+        }
 
         //数値の選択
         function selectNum(mode, tr, selectList, nowSelect, listNum) {
@@ -323,70 +378,76 @@
 
 
         //【クラス】ポケモンのステータス
-        function Status(number, name, agility) {
+        function Status(number, name, agility,isFav) {
             this.number = number;
             this.name = name;
             this.agility = agility;
+            this.isFav = isFav;
         }
 
 
         //ポケモンのステータスリストを作る
         function createStatusList() {
-            statusDatas.push(new Status(908, "マスカーニャ", 123));
-            statusDatas.push(new Status(911, "ラウドボーン", 66));
-            statusDatas.push(new Status(914, "ウェーニバル", 85));
-            statusDatas.push(new Status(663, "ファイアロー", 126));
-            statusDatas.push(new Status(956, "パーモット", 105));
-            statusDatas.push(new Status(820, "ヨクバリス", 20));
-            statusDatas.push(new Status(823, "アーマーガア", 67));
-            statusDatas.push(new Status(184, "マリルリ", 50));
-            statusDatas.push(new Status(1009, "ドオー", 20));
-            statusDatas.push(new Status(94, "ゲンガー", 110));
-            statusDatas.push(new Status(946, "イッカネズミ", 111));
-            statusDatas.push(new Status(398, "ムクホーク", 100));
-            statusDatas.push(new Status(429, "ムウマージ", 105));
-            statusDatas.push(new Status(445, "ガブリアス", 102));
-            statusDatas.push(new Status(965, "キョジオーン", 35));
-            statusDatas.push(new Status(1010, "コノヨザル", 90));
-            statusDatas.push(new Status(1004, "グレンアルマ", 75));
-            statusDatas.push(new Status(197, "ブラッキー", 65));
-            statusDatas.push(new Status(967, "キラフロル", 86));
-            statusDatas.push(new Status(248, "バンギラス", 61));
-            statusDatas.push(new Status(887, "ドラパルト", 142));
-            statusDatas.push(new Status(951, "セグレイブ", 87));
-            statusDatas.push(new Status(977, "サーフゴー", 84));
-            statusDatas.push(new Status(286, "キノガッサ", 70));
-            statusDatas.push(new Status(778, "ミミッキュ", 96));
-            statusDatas.push(new Status(934, "イルカマン", 100));
-            statusDatas.push(new Status(135, "サンダース", 130));
-            statusDatas.push(new Status(1002, "デカヌチャン", 94));
-            statusDatas.push(new Status(635, "サザンドラ", 98));
-            statusDatas.push(new Status(953, "モトトカゲ", 121));
-            statusDatas.push(new Status(59, "ウインディ", 95));
-            statusDatas.push(new Status(479, "ロトム", 86));
-            statusDatas.push(new Status(927, "クエスパトラ", 105));
-            statusDatas.push(new Status(373, "ボーマンダ", 100));
-            statusDatas.push(new Status(637, "ウルガモス", 100));
-            statusDatas.push(new Status(1007, "リククラゲ", 100));
-            statusDatas.push(new Status(149, "カイリュー", 80));
-            statusDatas.push(new Status(130, "ギャラドス", 81));
-            statusDatas.push(new Status(928, "リキキリン", 60));
-            statusDatas.push(new Status(700, "ニンフィア", 60));
-            statusDatas.push(new Status(1008, "ドドゲザン",50));
-            statusDatas.push(new Status(450, "カバルドン",47));
-            statusDatas.push(new Status(591, "モロバレル", 30));
-            statusDatas.push(new Status(423, "トリトドン", 39));
-            statusDatas.push(new Status(931, "ヘイラッシャ", 35));
-            statusDatas.push(new Status(952, "シャリタツ", 82));
-            statusDatas.push(new Status(212, "ハッサム", 65));
+
+            statusDatas.push(new Status(908, "マスカーニャ", 123,true));
+            statusDatas.push(new Status(911, "ラウドボーン", 66,false));
+            statusDatas.push(new Status(914, "ウェーニバル", 85, false));
+            statusDatas.push(new Status(663, "ファイアロー", 126, false));
+            statusDatas.push(new Status(956, "パーモット", 105, false));
+            statusDatas.push(new Status(820, "ヨクバリス", 20, false));
+            statusDatas.push(new Status(823, "アーマーガア", 67, false));
+            statusDatas.push(new Status(184, "マリルリ", 50, false));
+            statusDatas.push(new Status(1009, "ドオー", 20, false));
+            statusDatas.push(new Status(94, "ゲンガー", 110, false));
+            statusDatas.push(new Status(946, "イッカネズミ", 111, false));
+            statusDatas.push(new Status(398, "ムクホーク", 100, false));
+            statusDatas.push(new Status(429, "ムウマージ", 105, false));
+            statusDatas.push(new Status(445, "ガブリアス", 102, true));
+            statusDatas.push(new Status(965, "キョジオーン", 35, true));
+            statusDatas.push(new Status(1010, "コノヨザル", 90, true));
+            statusDatas.push(new Status(1004, "グレンアルマ", 75, true));
+            statusDatas.push(new Status(1005, "ソウブレイズ", 85, true));
+            statusDatas.push(new Status(197, "ブラッキー", 65, false));
+            statusDatas.push(new Status(967, "キラフロル", 86, false));
+            statusDatas.push(new Status(248, "バンギラス", 61, true));
+            statusDatas.push(new Status(887, "ドラパルト", 142, true));
+            statusDatas.push(new Status(951, "セグレイブ", 87, false));
+            statusDatas.push(new Status(977, "サーフゴー", 84, true));
+            statusDatas.push(new Status(286, "キノガッサ", 70, true));
+            statusDatas.push(new Status(778, "ミミッキュ", 96, true));
+            statusDatas.push(new Status(934, "イルカマン", 100, true));
+            statusDatas.push(new Status(135, "サンダース", 130, false));
+            statusDatas.push(new Status(1002, "デカヌチャン", 94, false));
+            statusDatas.push(new Status(635, "サザンドラ", 98, true));
+            statusDatas.push(new Status(953, "モトトカゲ", 121, false));
+            statusDatas.push(new Status(59, "ウインディ", 95, true));
+            statusDatas.push(new Status(479, "ロトム", 86, true));
+            statusDatas.push(new Status(927, "クエスパトラ", 105, false));
+            statusDatas.push(new Status(373, "ボーマンダ", 100, true));
+            statusDatas.push(new Status(637, "ウルガモス", 100, true));
+            statusDatas.push(new Status(1007, "リククラゲ", 100, false));
+            statusDatas.push(new Status(149, "カイリュー", 80, true));
+            statusDatas.push(new Status(130, "ギャラドス", 81, true));
+            statusDatas.push(new Status(928, "リキキリン", 60, false));
+            statusDatas.push(new Status(700, "ニンフィア", 60, true));
+            statusDatas.push(new Status(1008, "ドドゲザン", 50, true));
+            statusDatas.push(new Status(450, "カバルドン", 47, true));
+            statusDatas.push(new Status(591, "モロバレル", 30, true));
+            statusDatas.push(new Status(423, "トリトドン", 39, false));
+            statusDatas.push(new Status(931, "ヘイラッシャ", 35, true));
+            statusDatas.push(new Status(952, "シャリタツ", 82, false));
+            statusDatas.push(new Status(212, "ハッサム", 65, true));
 
 
         }
+
+      
 
         //表示用のポケモン単体追加status,努力値,性格補正,個体値
         function addShowPokemon(status, effort, temper, individual) {
             const pokemonData = new PokemonData(status, effort, temper, individual);
             showPokemonList.push(pokemonData);
+            //showPokemonList.unshift(pokemonData);
             //showPokemonList.push(new PokemonData(status, effort, temper, individual));
             //onsole.log(showPokemonList);
         }
@@ -394,10 +455,14 @@
         //表示用のポケモン全員追加
         function createAllShowPokemon() {
             for (let i = 0; i < statusDatas.length; i++) {
-                addShowPokemon(statusDatas[i], 252, 1.0, 31);
+
+                if (statusDatas[i].isFav) {
+                    addShowPokemon(statusDatas[i], 252, 1.0, 31);
+                }
+                
             }
 
-            //お気に入りで上書き
+            
         }
 
 
@@ -435,11 +500,11 @@
         }
 
 
+        $('.select').select2();
 
 
 
     </script>
-
 
 
 </body>
