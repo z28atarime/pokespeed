@@ -18,6 +18,14 @@
         .select2-selection__arrow {
             height: 35px !important;
         }
+
+        #speedNum{
+            font-weight: bold;
+        }
+        #speed {
+            font-size: 10px;
+            color:darkgrey;
+        }
     </style>
 
     <meta charset="utf-8" />
@@ -37,13 +45,12 @@
         </select>
     </nav>
 
-
-    <table class="table">
+    <table class="table table-sm">
         <thead>
             <tr>
                 <th scope="col"></th>
                 <th scope="col">素早</th>
-                <th scope="col">努力</th>
+                <th scope="col" style="width: 25%">努力</th>
                 <th scope="col">性格</th>
                 <th scope="col">個体</th>
                 <th scope="col"><img src="img/scarf.png"></th>
@@ -86,7 +93,7 @@
                 num = Math.floor(num * 50 / 100 + 5) * this.temper;
                 num = Math.floor(num);
 
-                console.log("スカーフ補正" + this.isScarf);
+                //console.log("スカーフ補正" + this.isScarf);
                 if (this.isScarf) {
 
                     num *= 1.5;
@@ -157,20 +164,27 @@
                 //すばやさ表示
                 let td = document.createElement("td");
 
-                var div = document.createElement("div");
-                div.setAttribute("class", "font-weight-bold");
-
-
+                var div1 = document.createElement("div");
+                div1.setAttribute("class", "row mx-auto");
+                div1.setAttribute("id", "speedNum");
+                var div2 = document.createElement("div");
+                //div2.setAttribute("class", "row");
+                div2.setAttribute("class", "row mx-auto small text-center");
+                div2.setAttribute("id", "speed");
                 td.setAttribute("style", "vertical-align:middle");
                 let inp = document.createTextNode(showPokemonList[i].agilityNum);
-                div.appendChild(inp);
-                td.appendChild(div);
+                let speed=document.createTextNode(showPokemonList[i].status.agility);
+                div1.appendChild(inp);
+                div2.appendChild(speed);
+                td.appendChild(div1);
+                td.appendChild(div2);
                 tr.appendChild(td);
                 table.appendChild(tr);
 
                 //努力値
                 var list = [252, 4, 0];
-                tr = selectNum(0, tr, list, showPokemonList[i].effort, i);
+                //tr = selectNum(0, tr, list, showPokemonList[i].effort, i);
+                tr=selectEffort(i,tr);
                 table.appendChild(tr);
 
                 //性格補正
@@ -246,6 +260,99 @@
             var selectTag = document.getElementById("searchPokemon");
 
         }
+        
+        //努力値の選択ウィンドウを作成
+        function selectEffort(listNum,tr){
+            var td = document.createElement("td");
+            var input = document.createElement("input");
+            input.setAttribute("class", "form-control");
+            input.setAttribute("list", "datalistOptions");
+            input.setAttribute("id", "effort"+listNum);
+            input.setAttribute("placeholder",showPokemonList[listNum].effort);
+            input.setAttribute("onclick", "clickEffort("+listNum+")");
+            input.setAttribute("onblur", "blurEffort("+listNum+")");
+            input.setAttribute("onchange", "changeEffortNum("+listNum+")");
+            input.setAttribute("type", "number");
+            //input.setAttribute("style", "width:60px");
+
+            var datalist = document.createElement("datalist");
+            datalist.setAttribute("id", "datalistOptions");
+
+            var list=[252,4,0];
+            for(let i=0; i<list.length;i++ ){
+                var option = document.createElement("option");
+                option.setAttribute("value", list[i]);
+                datalist.appendChild(option);
+            }
+            
+            td.appendChild(input);
+            td.appendChild(datalist);
+            tr.appendChild(td);
+            //初期値の設定
+            document.getElementById("effort"+listNum).value=showPokemonList[listNum].effort;
+
+
+
+            //<input class="form-control" list="datalistOptions" id="myBrowser" placeholder="Type to search..." onchange="changeEffortNum(0)" type="number">
+            //<datalist id="datalistOptions">
+
+                //<option value="252">
+                //<option value="4">
+                //<option value="0">
+ 
+            //</datalist>
+            return tr;
+        }
+
+        //努力値欄クリック
+        function clickEffort(listNum){
+            document.getElementById('effort'+listNum).value="";
+        }
+
+        function blurEffort(listNum){
+            document.getElementById('effort'+listNum).value=showPokemonList[listNum].effort;
+        }
+
+        //努力値の選択
+        function changeEffortNum(listNum){
+            console.log('effort'+listNum);
+            var val = document.getElementById('effort'+listNum)
+            console.log(val.value);
+            var valueNum=0;
+            
+            if(val.value==""){
+                valueNum=252;
+                document.getElementById('effort'+listNum).value=252;
+            }else{
+                valueNum=parseInt(val.value);
+            }
+            
+            console.log(val.value);
+            valueNum=parseInt(val.value);
+            
+            
+
+            
+            if(valueNum>252){
+                //252に設定
+                document.getElementById('effort'+listNum).value=252;
+
+            }else if(valueNum<0){
+                //0に設定
+                document.getElementById('effort'+listNum).value=0;
+            }
+            //console.log(valueNum);
+
+            //努力値変更
+            //console.log( showPokemonList[listNum]);
+            showPokemonList[listNum].effort=valueNum;
+            //document.getElementById('effort'+listNum).value=showPokemonList[listNum].effort;
+
+            showPokemonList[listNum].setAgilityNum();
+            showPokemonList[listNum].isReCalc = true;
+            showTable();
+            
+        }
 
         //数値の選択
         function selectNum(mode, tr, selectList, nowSelect, listNum) {
@@ -317,7 +424,7 @@
                 showPokemonList[values[0]].individual = Number(values[1]);
             }
 
-            console.log(showPokemonList);
+            //console.log(showPokemonList);
 
             showPokemonList[values[0]].setAgilityNum();
             showPokemonList[values[0]].isReCalc = true;
