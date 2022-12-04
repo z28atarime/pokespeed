@@ -26,6 +26,10 @@
             font-size: 10px;
             color:darkgrey;
         }
+
+        input::-webkit-calendar-picker-indicator{
+opacity:0;
+}
     </style>
 
     <meta charset="utf-8" />
@@ -278,7 +282,7 @@
             var datalist = document.createElement("datalist");
             datalist.setAttribute("id", "datalistOptions");
 
-            var list=[252,4,0];
+            var list=[252,0,4];
             for(let i=0; i<list.length;i++ ){
                 var option = document.createElement("option");
                 option.setAttribute("value", list[i]);
@@ -336,10 +340,14 @@
             if(valueNum>252){
                 //252に設定
                 document.getElementById('effort'+listNum).value=252;
+                valueNum=252;
+                console.log("253以上");
 
             }else if(valueNum<0){
                 //0に設定
                 document.getElementById('effort'+listNum).value=0;
+                valueNum=0;
+                console.log("0未満");
             }
             //console.log(valueNum);
 
