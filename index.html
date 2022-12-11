@@ -254,11 +254,11 @@ opacity:0;
         function addPokemon() {
             var value = document.getElementById("searchPokemon").value;
           
-            const pokemonData = new PokemonData(statusDatas[value], 252, 1, 31);
+            const pokemonData = new PokemonData(statusDatas[value], 252, 1.1, 31);
             pokemonData.isReCalc = true;
             showPokemonList.unshift(pokemonData);
 
-            //addShowPokemon(statusDatas[value], 252, 1, 31);
+            //addShowPokemon(statusDatas[value], 252, 1.1, 31);
             showTable();
 
             var selectTag = document.getElementById("searchPokemon");
@@ -524,7 +524,7 @@ opacity:0;
             statusDatas.push(new Status(1005, "ソウブレイズ", 85, true));
             statusDatas.push(new Status(197, "ブラッキー", 65, false));
             statusDatas.push(new Status(967, "キラフロル", 86, false));
-            statusDatas.push(new Status(248, "バンギラス", 61, true));
+            statusDatas.push(new Status(248, "バンギラス", 61, false));
             statusDatas.push(new Status(887, "ドラパルト", 142, true));
             statusDatas.push(new Status(951, "セグレイブ", 87, false));
             statusDatas.push(new Status(977, "サーフゴー", 84, true));
@@ -546,14 +546,27 @@ opacity:0;
             statusDatas.push(new Status(928, "リキキリン", 60, false));
             statusDatas.push(new Status(700, "ニンフィア", 60, true));
             statusDatas.push(new Status(1008, "ドドゲザン", 50, true));
-            statusDatas.push(new Status(450, "カバルドン", 47, true));
+            statusDatas.push(new Status(450, "カバルドン", 47, false));
             statusDatas.push(new Status(591, "モロバレル", 30, true));
             statusDatas.push(new Status(423, "トリトドン", 39, false));
             statusDatas.push(new Status(931, "ヘイラッシャ", 35, true));
             statusDatas.push(new Status(952, "シャリタツ", 82, false));
             statusDatas.push(new Status(212, "ハッサム", 65, true));
-
-
+            statusDatas.push(new Status(948, "ハルクジラ",73, false));
+            statusDatas.push(new Status(282, "サーナイト",80, false));
+            statusDatas.push(new Status(876, "イエッサン♀",85,true));
+            statusDatas.push(new Status(198, "ヤミカラス",91,true));
+            statusDatas.push(new Status(462, "ジバコイル",60,false));
+            statusDatas.push(new Status(217, "リングマ",55,false));
+            statusDatas.push(new Status(873, "モスノウ",65,false));
+            statusDatas.push(new Status(199, "ヤドキング",30,false));
+            statusDatas.push(new Status(460, "ユキノオー",60,false));
+            statusDatas.push(new Status(975, "アノホラグサ",90,false));
+            statusDatas.push(new Status(741, "オドリドリ",93,false));
+            statusDatas.push(new Status(971, "バウッツェル",95,false));
+            statusDatas.push(new Status(693, "ブロスター",59,false));
+            statusDatas.push(new Status(706, "ヌメルゴン",80,false));
+            statusDatas.push(new Status(324, "コータス",20,false));
         }
 
       
@@ -562,9 +575,7 @@ opacity:0;
         function addShowPokemon(status, effort, temper, individual) {
             const pokemonData = new PokemonData(status, effort, temper, individual);
             showPokemonList.push(pokemonData);
-            //showPokemonList.unshift(pokemonData);
-            //showPokemonList.push(new PokemonData(status, effort, temper, individual));
-            //onsole.log(showPokemonList);
+           
         }
 
         //表示用のポケモン全員追加
@@ -572,7 +583,7 @@ opacity:0;
             for (let i = 0; i < statusDatas.length; i++) {
 
                 if (statusDatas[i].isFav) {
-                    addShowPokemon(statusDatas[i], 252, 1.0, 31);
+                    addShowPokemon(statusDatas[i], 252, 1.1, 31);
                 }
                 
             }
