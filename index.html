@@ -161,6 +161,7 @@ opacity:0;
                 var img = document.createElement("img");
                 var number = showPokemonList[i].status.number;
                 img.src = 'img/n' + number + '.gif';
+                img.title = showPokemonList[i].status.name;
                 th.appendChild(img);
                 tr.appendChild(th);
 
@@ -555,7 +556,7 @@ opacity:0;
             statusDatas.push(new Status(948, "ハルクジラ",73, false));
             statusDatas.push(new Status(282, "サーナイト",80, false));
             statusDatas.push(new Status(876, "イエッサン♀",85,true));
-            statusDatas.push(new Status(198, "ヤミカラス",91,true));
+            statusDatas.push(new Status(198, "ヤミカラス",91,false));
             statusDatas.push(new Status(462, "ジバコイル",60,false));
             statusDatas.push(new Status(217, "リングマ",55,false));
             statusDatas.push(new Status(873, "モスノウ",65,false));
@@ -567,7 +568,6 @@ opacity:0;
             statusDatas.push(new Status(693, "ブロスター",59,false));
             statusDatas.push(new Status(706, "ヌメルゴン",80,false));
             statusDatas.push(new Status(324, "コータス", 20, true));
-
             statusDatas.push(new Status(279, "ペリッパー", 65, false));
 
             //パラドクス
@@ -577,7 +577,7 @@ opacity:0;
             statusDatas.push(new Status(982, "サケブシッポ", 111, true));
             statusDatas.push(new Status(983, "ハバタクカミ", 135, true));
             statusDatas.push(new Status(984, "チヲハウハネ", 81, false));
-            statusDatas.push(new Status(985, "トドロクツキ", 119, true));
+            statusDatas.push(new Status(985, "トドロクツキ", 119, false));
             statusDatas.push(new Status(986, "テツノワダチ", 106, false));
             statusDatas.push(new Status(988, "テツノドクガ", 110, true));
             statusDatas.push(new Status(989, "テツノカイナ", 50, true));
@@ -585,7 +585,11 @@ opacity:0;
             statusDatas.push(new Status(991, "テツノイバラ", 72, false));
             statusDatas.push(new Status(992, "テツノツツミ", 136, true));
 
-            
+            //準伝
+            statusDatas.push(new Status(994, "ディンルー", 45, true));
+            statusDatas.push(new Status(995, "パオジアン", 135, true));
+            statusDatas.push(new Status(996, "チオンジェン", 70, true));
+            statusDatas.push(new Status(997, "イーユイ", 100, true));
             
 
 
