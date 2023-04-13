@@ -19,9 +19,11 @@
             height: 35px !important;
         }
 
-        #speedNum{
-            font-weight: bold;
+        #speedNum{ 
+            font-weight: bold; 
+
         }
+
         #speed {
             font-size: 10px;
             color:darkgrey;
@@ -84,12 +86,14 @@ opacity:0;
                 this.individual = individual;//個体値
                 this.isScarf = false;//スカーフフラグ
                 this.isReCalc = false;//再計算フラグ
+                this.isTwice = false;//2回フラグ
 
                 this.setAgilityNum();//すばやさ実数値
                 //this.agilityNum = this.getAgilityNum();
 
             }
 
+            
             getAgilityNum() {
 
                 //var num = ((this.status.agility * 2 + this.individual + this.effort / 4) * 50 / 100 + 5) * this.temper;
@@ -104,6 +108,9 @@ opacity:0;
 
                 }
 
+                if (this.isTwice) {
+                    num *= 2.0;
+                }
                 num = Math.floor(num);
                 return num;
             }
@@ -168,10 +175,17 @@ opacity:0;
 
                 //すばやさ表示
                 let td = document.createElement("td");
+              
 
                 var div1 = document.createElement("div");
-                div1.setAttribute("class", "row mx-auto");
+                div1.setAttribute("class", "row mx-auto speedColor"+i);
                 div1.setAttribute("id", "speedNum");
+                //div1.setAttribute("class", "speedColor," + i);
+                
+
+                //すばやさを押すと2倍表示に切り替えられるように
+                td.setAttribute("onclick", "clickSpeed(" + i  + ")");
+
                 var div2 = document.createElement("div");
                 //div2.setAttribute("class", "row");
                 div2.setAttribute("class", "row mx-auto small text-center");
@@ -185,6 +199,14 @@ opacity:0;
                 td.appendChild(div2);
                 tr.appendChild(td);
                 table.appendChild(tr);
+
+                //すばやさ2倍フラグを確認し、色の変更
+                isTwiceMode = showPokemonList[i].isTwice;
+                if (isTwiceMode) {
+                    document.getElementsByClassName("speedColor" + i)[0].style.color = "red";
+                } else {
+                    document.getElementsByClassName("speedColor" + i)[0].style.color = "black";
+                }
 
                 //努力値
                 var list = [252, 4, 0];
@@ -470,6 +492,24 @@ opacity:0;
             tr.appendChild(td);
 
             return tr;
+        }
+
+        //素早さ2倍表示処理
+        function clickSpeed(speedId) {
+
+            console.log(speedId)
+            isTwiceMode = showPokemonList[speedId].isTwice;
+            console.log(isTwiceMode)
+            if (isTwiceMode) {
+                showPokemonList[speedId].isTwice = false;
+            } else {
+                showPokemonList[speedId].isTwice = true;
+               // document.getElementById("speedColor" + speedId).style.color = "red";
+            }
+            
+            showPokemonList[speedId].setAgilityNum();
+            showPokemonList[speedId].isReCalc = true;
+            showTable();
         }
 
         function checkChange(checkId) {
