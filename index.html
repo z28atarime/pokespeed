@@ -45,11 +45,9 @@ opacity:0;
 
     <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
         <button type="button" class="btn btn-primary col-auto ms-2 me-1 my-1" onclick="update()">更新</button>
-        <div class="mx-1">
-           <select class="select" id="searchPokemon" style="width: 250px" data-placeholder="追加ポケモンを選択">
-               <option ></option>
-           </select>
-        </div>
+        <select class="select mx-2" id="searchPokemon" style="width: 250px" data-placeholder="追加するポケモンを選択">
+            <option ></option>
+        </select>
         <button type="button" class="btn btn-success col-auto ms-auto me-1 my-1" onclick="loadPokeData();">読込</button>
         <button type="button" class="btn btn-success col-auto me-1 my-1" onclick="saveToLocalStorage('savedshowPokemonList', showPokemonList);">保存</button>
     </nav>
