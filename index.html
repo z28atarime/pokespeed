@@ -45,12 +45,13 @@ opacity:0;
 
     <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
         <button type="button" class="btn btn-primary col-auto ms-2 me-1 my-1" onclick="update()">更新</button>
-        <select class="select mx-2" id="searchPokemon" style="width: 250px" data-placeholder="追加するポケモンを選択">
-            <option ></option>
-
-        </select>
+        <div class="mx-1">
+           <select class="select" id="searchPokemon" style="width: 250px" data-placeholder="追加ポケモンを選択">
+               <option ></option>
+           </select>
+        </div>
         <button type="button" class="btn btn-success col-auto ms-auto me-1 my-1" onclick="loadPokeData();">読込</button>
-        <button type="button" class="btn btn-success col-auto me-1 my-1" onclick="saveToLocalStorage('showPokemonList', showPokemonList);">保存</button>
+        <button type="button" class="btn btn-success col-auto me-1 my-1" onclick="saveToLocalStorage('savedshowPokemonList', showPokemonList);">保存</button>
     </nav>
 
     <table class="table table-sm">
@@ -285,7 +286,7 @@ opacity:0;
             //addShowPokemon(statusDatas[value], 252, 1.1, 31);
             showTable();
 
-            var selectTag = document.getElementById("searchPokemon");
+            //var selectTag = document.getElementById("searchPokemon");
 
         }
         
@@ -724,32 +725,36 @@ opacity:0;
 
         }
 
-        //ローカルストレージ保存用の関数
+        // ローカルストレージ保存用の関数
         function saveToLocalStorage(key, data) {
             const jsonData = JSON.stringify(data);
             localStorage.setItem(key, jsonData);
         }
-        
-        //ローカルストレージ読み込み用の関数
+
+        // 手動でオブジェクトを再構成する関数
+        function reconstructPokemonDataInstance(data) {
+            let instance = Object.create(PokemonData.prototype);
+            Object.assign(instance, data);
+            return instance;
+        }
+
+        // ローカルストレージ読み込み用の関数
         function loadInstances(key) {
             const jsonData = localStorage.getItem(key);
             if (jsonData) {
                 const dataArray = JSON.parse(jsonData);
-                return dataArray;
+                // 各オブジェクトデータをPokemonDataのインスタンスに変換
+                return dataArray.map(reconstructPokemonDataInstance);
             }
-            return null;
+            return [];
         }
 
         //読み込みボタン
         function loadPokeData(){
             //前回のデータを読み込み
-            if (localStorage.getItem('showPokemonList')) {
-                showPokemonList = loadInstances('showPokemonList');
+            if (localStorage.getItem('savedshowPokemonList')) {
+                showPokemonList = loadInstances('savedshowPokemonList');
             }
-
-            //すばやさでソート
-            showPokemonList = sort();
-
 
             showTable();
         }
